@@ -30,6 +30,10 @@ export function calcDeliveryFee(
   options: DeliveryOptions = {},
 ): number {
   assertValidWeight(weightKg);
-  if ((options.orderAmount ?? 0) >= 1000) return 0;
+  const orderAmount = options.orderAmount ?? 0;
+  if (!Number.isFinite(orderAmount) || orderAmount < 0) {
+    throw new Error('INVALID_AMOUNT');
+  }
+  if (orderAmount >= 1000) return 0;
   return applyExpress(calcBaseFee(weightKg), options.express === true);
 }
