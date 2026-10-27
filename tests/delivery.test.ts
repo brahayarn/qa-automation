@@ -8,3 +8,12 @@ it.each([0, -1, NaN, Infinity])('відхиляє некоректну вагу 
 it.each([0.1, 1, 5])('до 5 кг включно: %s кг коштує 50 грн', (weight) => {
   expect(calcDeliveryFee(weight)).toBe(50);
 });
+
+it.each([
+  { weight: 5.1, expected: 60 },
+  { weight: 6, expected: 60 },
+  { weight: 6.1, expected: 70 },
+  { weight: 10, expected: 100 },
+])('понад 5 кг: $weight кг → $expected грн', ({ weight, expected }) => {
+  expect(calcDeliveryFee(weight)).toBe(expected);
+});
