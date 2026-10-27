@@ -48,3 +48,10 @@ it.each([
     expect(calcDeliveryFee(weight, { orderAmount, express })).toBe(expected);
   },
 );
+
+it.each([-1, -0.01, NaN, Infinity])(
+  'відхиляє некоректну суму замовлення %s',
+  (orderAmount) => {
+    expect(() => calcDeliveryFee(1, { orderAmount })).toThrow('INVALID_AMOUNT');
+  },
+);
