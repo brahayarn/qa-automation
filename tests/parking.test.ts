@@ -16,3 +16,12 @@ it.each([
 ])('перша година: $minutes хв → $expected грн', ({ minutes, expected }) => {
   expect(calcParkingFee(minutes)).toBe(expected);
 });
+
+it.each([
+  { minutes: 61, expected: 50 },
+  { minutes: 120, expected: 50 },
+  { minutes: 121, expected: 70 },
+  { minutes: 180, expected: 70 },
+])('наступні години: $minutes хв → $expected грн', ({ minutes, expected }) => {
+  expect(calcParkingFee(minutes)).toBe(expected);
+});
