@@ -8,3 +8,11 @@ it.each([-1, -60, 10.5])('відхиляє тривалість %s', (minutes) =
 it.each([0, 1, 15])('перші 15 хвилин безкоштовні: %i', (minutes) => {
   expect(calcParkingFee(minutes)).toBe(0);
 });
+
+it.each([
+  { minutes: 15, expected: 0 },
+  { minutes: 16, expected: 30 },
+  { minutes: 60, expected: 30 },
+])('перша година: $minutes хв → $expected грн', ({ minutes, expected }) => {
+  expect(calcParkingFee(minutes)).toBe(expected);
+});
