@@ -8,10 +8,17 @@ const BASE_FEE = 50;
 const EXTRA_KG_FEE = 10;
 const MAX_FEE = 300;
 const EXPRESS_RATE = 2;
+const FREE_DELIVERY_FROM = 1000;
 
 function assertValidWeight(weightKg: number): void {
   if (!Number.isFinite(weightKg) || weightKg <= 0) {
     throw new Error('INVALID_WEIGHT');
+  }
+}
+
+function assertValidAmount(orderAmount: number): void {
+  if (!Number.isFinite(orderAmount) || orderAmount < 0) {
+    throw new Error('INVALID_AMOUNT');
   }
 }
 
@@ -25,15 +32,17 @@ export function applyExpress(fee: number, express: boolean): number {
   return express ? fee * EXPRESS_RATE : fee;
 }
 
+export function isFreeDelivery(orderAmount: number): boolean {
+  return orderAmount >= FREE_DELIVERY_FROM;
+}
+
 export function calcDeliveryFee(
   weightKg: number,
   options: DeliveryOptions = {},
 ): number {
+  const { orderAmount = 0, express = false } = options;
   assertValidWeight(weightKg);
-  const orderAmount = options.orderAmount ?? 0;
-  if (!Number.isFinite(orderAmount) || orderAmount < 0) {
-    throw new Error('INVALID_AMOUNT');
-  }
-  if (orderAmount >= 1000) return 0;
-  return applyExpress(calcBaseFee(weightKg), options.express === true);
+  assertValidAmount(orderAmount);
+  if (isFreeDelivery(orderAmount)) return 0;
+  return applyExpress(calcBaseFee(weightKg), express);
 }
