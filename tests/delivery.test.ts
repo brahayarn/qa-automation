@@ -17,3 +17,12 @@ it.each([
 ])('понад 5 кг: $weight кг → $expected грн', ({ weight, expected }) => {
   expect(calcDeliveryFee(weight)).toBe(expected);
 });
+
+it.each([
+  { weight: 29, expected: 290 },
+  { weight: 30, expected: 300 },
+  { weight: 31, expected: 300 },
+  { weight: 100, expected: 300 },
+])('межа 300 грн: $weight кг → $expected грн', ({ weight, expected }) => {
+  expect(calcDeliveryFee(weight)).toBe(expected);
+});
