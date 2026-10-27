@@ -34,3 +34,17 @@ it.each([
 ])('експрес: $weight кг → $expected грн', ({ weight, expected }) => {
   expect(calcDeliveryFee(weight, { express: true })).toBe(expected);
 });
+
+it.each([
+  { orderAmount: 999.99, weight: 1, express: false, expected: 50 },
+  { orderAmount: 1000, weight: 1, express: false, expected: 0 },
+  { orderAmount: 1001, weight: 1, express: false, expected: 0 },
+  { orderAmount: 1000, weight: 100, express: false, expected: 0 },
+  { orderAmount: 1000, weight: 1, express: true, expected: 0 },
+  { orderAmount: 999.99, weight: 1, express: true, expected: 100 },
+])(
+  'сума $orderAmount, $weight кг, експрес $express → $expected грн',
+  ({ orderAmount, weight, express, expected }) => {
+    expect(calcDeliveryFee(weight, { orderAmount, express })).toBe(expected);
+  },
+);
