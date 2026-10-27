@@ -51,3 +51,8 @@ it.each([
     expect(calcParkingFee(minutes, opts)).toBeCloseTo(expected, 2);
   },
 );
+
+it('заокруглює результат до копійок', () => {
+  expect(calcParkingFee(45, { night: true, weekend: true })).toBe(12);
+  expect(calcParkingFee(121, { night: true, weekend: true })).toBe(28);
+});
