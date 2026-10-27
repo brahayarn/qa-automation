@@ -30,5 +30,6 @@ export function calcDeliveryFee(
   options: DeliveryOptions = {},
 ): number {
   assertValidWeight(weightKg);
+  if ((options.orderAmount ?? 0) >= 1000) return 0;
   return applyExpress(calcBaseFee(weightKg), options.express === true);
 }
