@@ -3,6 +3,7 @@
 - ЛР 1. Розгортання середовища автоматизації тестування, перший автоматизований тест
 - ЛР 2. Модульне тестування бізнес-логіки засобами Vitest: матчери, параметризовані тести, покриття коду
 - ЛР 3. Розроблення через тестування (TDD), цикл Red – Green – Refactor
+- ЛР 4. Тестові дублери та перехоплення мережевих запитів: Vitest, підробки, підміна часу, MSW
 
 ## Використані інструменти
 
@@ -17,14 +18,27 @@ qa-automation/
 │   ├── distance.ts
 │   ├── order.ts
 │   ├── parking.ts
-│   └── delivery.ts
+│   ├── delivery.ts
+│   ├── order-service.ts
+│   ├── retry.ts
+│   ├── rate-provider.ts
+│   ├── cancel-service.ts
+│   └── payment-gateway.ts
 ├── tests/
 │   ├── temperature.test.ts
 │   ├── distance.test.ts
 │   ├── order.test.ts
 │   ├── loyalty.test.ts
 │   ├── parking.test.ts
-│   └── delivery.test.ts
+│   ├── delivery.test.ts
+│   ├── order-service.test.ts
+│   ├── retry.test.ts
+│   ├── rate-provider.test.ts
+│   ├── cancel-service.test.ts
+│   ├── payment-gateway.test.ts
+│   ├── setup.ts
+│   ├── fakes/
+│   └── msw/
 ├── .gitignore
 ├── .prettierrc
 ├── eslint.config.mjs
@@ -95,3 +109,13 @@ npm ci
 5. Експрес – подвійний тариф (подвоюється вже обмежений тариф, тому максимум 600 грн).
 6. Сума замовлення від 1000 грн – доставка безкоштовна, також і для експресу.
 7. Сума замовлення не може бути від'ємною або нечисловою, інакше `INVALID_AMOUNT`.
+
+## ЛР 4. Скасування замовлення з поверненням коштів
+
+`CancelService` скасовує оплачене замовлення: повертає кошти через HTTP-шлюз платежів, змінює статус у сховищі й надсилає клієнту лист. Усі три залежності (`CancelOrderStore`, `PaymentGateway`, `Notifier`) описані інтерфейсами й передаються через конструктор.
+
+- `HttpPaymentGateway` надсилає `POST /refunds` і відхиляє помилкові статуси (`REFUND_FAILED`) та некоректний формат відповіді (`INVALID_REFUND_FORMAT`).
+- Якщо повернення коштів не вдалося, статус не змінюється і лист не надсилається.
+- Помилки сервісу: `ORDER_NOT_FOUND`, `ALREADY_CANCELLED`.
+
+Тести ізольовані від реальної мережі та часу: HTTP перехоплює MSW (`onUnhandledRequest: 'error'`, `resetHandlers` після кожного тесту), час підміняється через `vi.useFakeTimers`. Сервер MSW і початкове налаштування лежать у `tests/msw/` і `tests/setup.ts`, підробки сховищ – у `tests/fakes/`.
