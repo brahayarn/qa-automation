@@ -4,6 +4,7 @@
 - ЛР 2. Модульне тестування бізнес-логіки засобами Vitest: матчери, параметризовані тести, покриття коду
 - ЛР 3. Розроблення через тестування (TDD), цикл Red – Green – Refactor
 - ЛР 4. Тестові дублери та перехоплення мережевих запитів: Vitest, підробки, підміна часу, MSW
+- ЛР 5. Автоматизація тестування REST API: Supertest, JSON Schema, Postman і Newman
 
 ## Використані інструменти
 
@@ -23,7 +24,10 @@ qa-automation/
 │   ├── retry.ts
 │   ├── rate-provider.ts
 │   ├── cancel-service.ts
-│   └── payment-gateway.ts
+│   ├── payment-gateway.ts
+│   └── api/
+│       ├── app.ts
+│       └── server.ts
 ├── tests/
 │   ├── temperature.test.ts
 │   ├── distance.test.ts
@@ -38,7 +42,9 @@ qa-automation/
 │   ├── payment-gateway.test.ts
 │   ├── setup.ts
 │   ├── fakes/
-│   └── msw/
+│   ├── msw/
+│   └── api/
+├── postman/
 ├── .gitignore
 ├── .prettierrc
 ├── eslint.config.mjs
@@ -69,13 +75,15 @@ npm ci
 
 ## Запуск
 
-| Команда              | Призначення                     |
-| -------------------- | ------------------------------- |
-| `npm test`           | одноразовий прогін усіх тестів  |
-| `npm run test:watch` | режим спостереження             |
-| `npm run coverage`   | прогін із вимірюванням покриття |
-| `npm run lint`       | статичний аналіз коду           |
-| `npm run format`     | форматування коду               |
+| Команда              | Призначення                                                           |
+| -------------------- | --------------------------------------------------------------------- |
+| `npm test`           | одноразовий прогін усіх тестів                                        |
+| `npm run test:watch` | режим спостереження                                                   |
+| `npm run coverage`   | прогін із вимірюванням покриття                                       |
+| `npm run lint`       | статичний аналіз коду                                                 |
+| `npm run format`     | форматування коду                                                     |
+| `npm start`          | запуск навчального API на порту 3000                                  |
+| `npm run newman`     | запуск колекції Postman через Newman (потрібен запущений `npm start`) |
 
 Звіт про покриття зберігається в `coverage/index.html`.
 
@@ -119,3 +127,24 @@ npm ci
 - Помилки сервісу: `ORDER_NOT_FOUND`, `ALREADY_CANCELLED`.
 
 Тести ізольовані від реальної мережі та часу: HTTP перехоплює MSW (`onUnhandledRequest: 'error'`, `resetHandlers` після кожного тесту), час підміняється через `vi.useFakeTimers`. Сервер MSW і початкове налаштування лежать у `tests/msw/` і `tests/setup.ts`, підробки сховищ – у `tests/fakes/`.
+
+## ЛР 5. Тестування REST API: статуси замовлення
+
+Навчальний сервіс замовлень на Express (`src/api/app.ts`) експортує фабрику `createApp`: кожен виклик створює новий застосунок із порожнім сховищем, тому тести ізольовані.
+
+Розширення: `PATCH /orders/:id/status` змінює статус замовлення за ланцюжком `new → paid → shipped`.
+
+| Ситуація                                                | Відповідь                 |
+| ------------------------------------------------------- | ------------------------- |
+| допустимий перехід                                      | 200 і оновлене замовлення |
+| недопустимий перехід (пропуск, назад, той самий статус) | 409, `INVALID_TRANSITION` |
+| невідомий або відсутній статус                          | 400, `INVALID_STATUS`     |
+| без токена або з підробленим токеном                    | 401, `UNAUTHORIZED`       |
+| чуже або неіснуюче замовлення                           | 404, `NOT_FOUND`          |
+
+Тести (`tests/api/`) перевіряють код, структуру за JSON Schema (`additionalProperties: false`), значення, заголовки й побічний ефект наступним запитом. Колекція Postman лежить у `postman/orders.postman_collection.json`:
+
+```bash
+npm start
+npm run newman
+```
