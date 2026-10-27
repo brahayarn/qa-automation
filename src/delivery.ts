@@ -15,7 +15,11 @@ export function calcDeliveryFee(
   if (!Number.isFinite(weightKg) || weightKg <= 0) {
     throw new Error('INVALID_WEIGHT');
   }
-  if (weightKg <= BASE_WEIGHT_KG) return BASE_FEE;
-  const extraKg = Math.ceil(weightKg - BASE_WEIGHT_KG);
-  return Math.min(BASE_FEE + extraKg * EXTRA_KG_FEE, MAX_FEE);
+  let fee = BASE_FEE;
+  if (weightKg > BASE_WEIGHT_KG) {
+    const extraKg = Math.ceil(weightKg - BASE_WEIGHT_KG);
+    fee = Math.min(BASE_FEE + extraKg * EXTRA_KG_FEE, MAX_FEE);
+  }
+  if (options.express) fee = fee * 2;
+  return fee;
 }
