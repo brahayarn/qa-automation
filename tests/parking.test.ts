@@ -41,3 +41,13 @@ it.each([
 ])('нічний тариф: $minutes хв → $expected грн', ({ minutes, expected }) => {
   expect(calcParkingFee(minutes, { night: true })).toBeCloseTo(expected, 2);
 });
+
+it.each([
+  { minutes: 600, opts: { weekend: true }, expected: 160 },
+  { minutes: 600, opts: { night: true, weekend: true }, expected: 80 },
+])(
+  'вихідний: $minutes хв $opts → $expected грн',
+  ({ minutes, opts, expected }) => {
+    expect(calcParkingFee(minutes, opts)).toBeCloseTo(expected, 2);
+  },
+);
