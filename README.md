@@ -2,6 +2,7 @@
 
 - ЛР 1. Розгортання середовища автоматизації тестування, перший автоматизований тест
 - ЛР 2. Модульне тестування бізнес-логіки засобами Vitest: матчери, параметризовані тести, покриття коду
+- ЛР 3. Розроблення через тестування (TDD), цикл Red – Green – Refactor
 
 ## Використані інструменти
 
@@ -14,12 +15,16 @@ qa-automation/
 ├── src/
 │   ├── temperature.ts
 │   ├── distance.ts
-│   └── order.ts
+│   ├── order.ts
+│   ├── parking.ts
+│   └── delivery.ts
 ├── tests/
 │   ├── temperature.test.ts
 │   ├── distance.test.ts
 │   ├── order.test.ts
-│   └── loyalty.test.ts
+│   ├── loyalty.test.ts
+│   ├── parking.test.ts
+│   └── delivery.test.ts
 ├── .gitignore
 ├── .prettierrc
 ├── eslint.config.mjs
@@ -34,6 +39,8 @@ qa-automation/
 - `src/order.ts` – ЛР 2: розрахунок вартості замовлення і списання бонусних балів
 - `tests/order.test.ts` – тести показової частини ЛР 2
 - `tests/loyalty.test.ts` – ЛР 2: тести функції `applyLoyaltyPoints`
+- `src/parking.ts` – ЛР 3, показовий приклад: тарифікатор паркування
+- `src/delivery.ts` – ЛР 3: тарифікатор доставки
 - `vitest.config.ts` – налаштування раннера тестів і покриття
 - `eslint.config.mjs`, `.prettierrc` – налаштування лінтера та форматування
 - `tsconfig.json` – налаштування TypeScript
@@ -74,3 +81,17 @@ npm ci
 | від'ємна кількість балів    | `NEGATIVE_POINTS` |
 | неціла кількість балів      | `INVALID_POINTS`  |
 | від'ємна або нечислова сума | `INVALID_TOTAL`   |
+
+## ЛР 3. Тарифікатор доставки (TDD)
+
+`calcDeliveryFee(weightKg, { orderAmount, express })` – вартість доставки, розроблена за циклом Red – Green – Refactor. Кожен крок зафіксовано окремим комітом із префіксом `red`, `green` або `refactor`: `git log --oneline`.
+
+Правила в порядку реалізації:
+
+1. Вага має бути додатним скінченним числом, інакше `INVALID_WEIGHT`.
+2. До 5 кг включно – 50 грн.
+3. Кожен наступний розпочатий кілограм – 10 грн.
+4. Максимум 300 грн.
+5. Експрес – подвійний тариф (подвоюється вже обмежений тариф, тому максимум 600 грн).
+6. Сума замовлення від 1000 грн – доставка безкоштовна, також і для експресу.
+7. Сума замовлення не може бути від'ємною або нечисловою, інакше `INVALID_AMOUNT`.
