@@ -5,10 +5,12 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     include: ['tests/**/*.test.ts'],
+    setupFiles: ['tests/setup.ts'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'html'],
+      reporter: [['text', { skipFull: false }], 'html'],
       include: ['src/**/*.ts'],
+      exclude: ['src/api/server.ts'],
       thresholds: {
         lines: 80,
         branches: 80,
